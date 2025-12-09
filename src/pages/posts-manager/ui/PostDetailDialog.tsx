@@ -1,15 +1,16 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui";
 import { CommentsList } from "./CommentsList";
 import { highlightText } from "../../../shared/lib";
+import { Post, Comment } from "../../../shared/types";
 
 interface PostDetailDialogProps {
   showPostDetailDialog: boolean;
   setShowPostDetailDialog: (show: boolean) => void;
-  selectedPost: any;
+  selectedPost: Post | null;
   searchQuery: string;
-  comments: Record<number, any[]>;
+  comments: Record<number, Comment[]>;
   onAddComment: (postId: number) => void;
-  onEditComment: (comment: any) => void;
+  onEditComment: (comment: Comment) => void;
   onDeleteComment: (id: number, postId: number) => void;
   onLikeComment: (id: number, postId: number) => void;
 }

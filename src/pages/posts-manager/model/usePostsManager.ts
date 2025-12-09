@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { postsApi, usersApi, tagsApi, commentsApi } from "../../../shared/api";
+import { Post, Comment, User, Tag, NewPost, NewComment } from "../../../shared/types";
 
 export const usePostsManager = () => {
   const navigate = useNavigate();
@@ -8,20 +9,20 @@ export const usePostsManager = () => {
   const queryParams = new URLSearchParams(location.search);
 
   // 상태 관리
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [total, setTotal] = useState(0);
   const [skip, setSkip] = useState(parseInt(queryParams.get("skip") || "0"));
   const [limit, setLimit] = useState(parseInt(queryParams.get("limit") || "10"));
   const [searchQuery, setSearchQuery] = useState(queryParams.get("search") || "");
-  const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [sortBy, setSortBy] = useState(queryParams.get("sortBy") || "");
   const [sortOrder, setSortOrder] = useState(queryParams.get("sortOrder") || "asc");
   const [loading, setLoading] = useState(false);
-  const [tags, setTags] = useState<any[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTag, setSelectedTag] = useState(queryParams.get("tag") || "");
-  const [comments, setComments] = useState<Record<number, any[]>>({});
-  const [selectedComment, setSelectedComment] = useState<any>(null);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [comments, setComments] = useState<Record<number, Comment[]>>({});
+  const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Dialog 상태
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -32,8 +33,8 @@ export const usePostsManager = () => {
   const [showUserModal, setShowUserModal] = useState(false);
 
   // Form 상태
-  const [newPost, setNewPost] = useState({ title: "", body: "", userId: 1 });
-  const [newComment, setNewComment] = useState({ body: "", postId: null as number | null, userId: 1 });
+  const [newPost, setNewPost] = useState<NewPost>({ title: "", body: "", userId: 1 });
+  const [newComment, setNewComment] = useState<NewComment>({ body: "", postId: null, userId: 1 });
 
   // URL 업데이트 함수
   const updateURL = () => {
@@ -48,14 +49,14 @@ export const usePostsManager = () => {
   };
 
   // 게시물 가져오기
-  const fetchPosts = async () => {
+  const fetchPosts = async (): Promise<void> => {
     setLoading(true);
     try {
       const [postsData, usersData] = await Promise.all([postsApi.getPosts(limit, skip), usersApi.getUsers()]);
 
-      const postsWithUsers = postsData.posts.map((post: any) => ({
+      const postsWithUsers: Post[] = postsData.posts.map((post) => ({
         ...post,
-        author: usersData.users.find((user: any) => user.id === post.userId),
+        author: usersData.users.find((user) => user.id === post.userId),
       }));
       setPosts(postsWithUsers);
       setTotal(postsData.total);
@@ -67,7 +68,7 @@ export const usePostsManager = () => {
   };
 
   // 태그 가져오기
-  const fetchTags = async () => {
+  const fetchTags = async (): Promise<void> => {
     try {
       const data = await tagsApi.getTags();
       setTags(data);
@@ -77,7 +78,7 @@ export const usePostsManager = () => {
   };
 
   // 게시물 검색
-  const searchPosts = async () => {
+  const searchPosts = async (): Promise<void> => {
     if (!searchQuery) {
       fetchPosts();
       return;
@@ -94,7 +95,7 @@ export const usePostsManager = () => {
   };
 
   // 태그별 게시물 가져오기
-  const fetchPostsByTag = async (tag: string) => {
+  const fetchPostsByTag = async (tag: string): Promise<void> => {
     if (!tag || tag === "all") {
       fetchPosts();
       return;
@@ -103,9 +104,9 @@ export const usePostsManager = () => {
     try {
       const [postsData, usersData] = await Promise.all([postsApi.getPostsByTag(tag), usersApi.getUsers()]);
 
-      const postsWithUsers = postsData.posts.map((post: any) => ({
+      const postsWithUsers: Post[] = postsData.posts.map((post) => ({
         ...post,
-        author: usersData.users.find((user: any) => user.id === post.userId),
+        author: usersData.users.find((user) => user.id === post.userId),
       }));
 
       setPosts(postsWithUsers);
@@ -117,7 +118,7 @@ export const usePostsManager = () => {
   };
 
   // 게시물 추가
-  const addPost = async () => {
+  const addPost = async (): Promise<void> => {
     try {
       const data = await postsApi.addPost(newPost);
       setPosts([data, ...posts]);
@@ -129,10 +130,19 @@ export const usePostsManager = () => {
   };
 
   // 게시물 업데이트
-  const updatePost = async () => {
+  const updatePost = async (): Promise<void> => {
+    if (!selectedPost) return;
     try {
-      const data = await postsApi.updatePost(selectedPost.id, selectedPost);
-      setPosts(posts.map((post) => (post.id === data.id ? data : post)));
+      await postsApi.updatePost(selectedPost.id, {
+        title: selectedPost.title,
+        body: selectedPost.body,
+      });
+
+      setPosts(
+        posts.map((post) =>
+          post.id === selectedPost.id ? { ...post, title: selectedPost.title, body: selectedPost.body } : post,
+        ),
+      );
       setShowEditDialog(false);
     } catch (error) {
       console.error("게시물 업데이트 오류:", error);
@@ -140,7 +150,7 @@ export const usePostsManager = () => {
   };
 
   // 게시물 삭제
-  const deletePost = async (id: number) => {
+  const deletePost = async (id: number): Promise<void> => {
     try {
       await postsApi.deletePost(id);
       setPosts(posts.filter((post) => post.id !== id));
@@ -150,7 +160,7 @@ export const usePostsManager = () => {
   };
 
   // 댓글 가져오기
-  const fetchComments = async (postId: number) => {
+  const fetchComments = async (postId: number): Promise<void> => {
     if (comments[postId]) return;
     try {
       const data = await commentsApi.getComments(postId);
@@ -161,9 +171,14 @@ export const usePostsManager = () => {
   };
 
   // 댓글 추가
-  const addComment = async () => {
+  const addComment = async (): Promise<void> => {
+    if (!newComment.postId) return;
     try {
-      const data = await commentsApi.addComment(newComment as any);
+      const data = await commentsApi.addComment({
+        body: newComment.body,
+        postId: newComment.postId,
+        userId: newComment.userId,
+      });
       setComments((prev) => ({
         ...prev,
         [data.postId]: [...(prev[data.postId] || []), data],
@@ -176,7 +191,8 @@ export const usePostsManager = () => {
   };
 
   // 댓글 업데이트
-  const updateComment = async () => {
+  const updateComment = async (): Promise<void> => {
+    if (!selectedComment) return;
     try {
       const data = await commentsApi.updateComment(selectedComment.id, selectedComment.body);
       setComments((prev) => ({
@@ -190,7 +206,7 @@ export const usePostsManager = () => {
   };
 
   // 댓글 삭제
-  const deleteComment = async (id: number, postId: number) => {
+  const deleteComment = async (id: number, postId: number): Promise<void> => {
     try {
       await commentsApi.deleteComment(id);
       setComments((prev) => ({
@@ -203,9 +219,10 @@ export const usePostsManager = () => {
   };
 
   // 댓글 좋아요
-  const likeComment = async (id: number, postId: number) => {
+  const likeComment = async (id: number, postId: number): Promise<void> => {
     try {
       const currentComment = comments[postId].find((c) => c.id === id);
+      if (!currentComment) return;
       await commentsApi.likeComment(id, currentComment.likes + 1);
       setComments((prev) => ({
         ...prev,
@@ -219,14 +236,14 @@ export const usePostsManager = () => {
   };
 
   // 게시물 상세 보기
-  const openPostDetail = (post: any) => {
+  const openPostDetail = (post: Post): void => {
     setSelectedPost(post);
     fetchComments(post.id);
     setShowPostDetailDialog(true);
   };
 
   // 사용자 모달 열기
-  const openUserModal = async (user: any) => {
+  const openUserModal = async (user: User): Promise<void> => {
     try {
       const userData = await usersApi.getUser(user.id);
       setSelectedUser(userData);

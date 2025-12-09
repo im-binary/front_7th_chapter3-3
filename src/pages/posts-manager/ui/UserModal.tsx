@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui";
+import { User } from "../../../shared/types";
 
 interface UserModalProps {
   showUserModal: boolean;
   setShowUserModal: (show: boolean) => void;
-  selectedUser: any;
+  selectedUser: User | null;
 }
 
 export const UserModal = ({ showUserModal, setShowUserModal, selectedUser }: UserModalProps) => {

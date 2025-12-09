@@ -1,10 +1,11 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from "../../../shared/ui";
+import { Comment } from "../../../shared/types";
 
 interface EditCommentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  comment: any;
-  onCommentChange: (comment: any) => void;
+  comment: Comment | null;
+  onCommentChange: (comment: Comment) => void;
   onSubmit: () => void;
 }
 
@@ -25,7 +26,7 @@ export const EditCommentDialog = ({
           <Textarea
             placeholder="댓글 내용"
             value={comment?.body || ""}
-            onChange={(e) => onCommentChange({ ...comment, body: e.target.value })}
+            onChange={(e) => onCommentChange({ ...comment!, body: e.target.value })}
           />
           <Button onClick={onSubmit}>댓글 업데이트</Button>
         </div>

@@ -1,13 +1,14 @@
 import { Edit2, Plus, ThumbsUp, Trash2 } from "lucide-react";
 import { Button } from "../../../shared/ui";
 import { highlightText } from "../../../shared/lib";
+import { Comment } from "../../../shared/types";
 
 interface CommentsListProps {
   postId: number;
-  comments: any[];
+  comments: Comment[];
   searchQuery: string;
   onAddComment: (postId: number) => void;
-  onEditComment: (comment: any) => void;
+  onEditComment: (comment: Comment) => void;
   onDeleteComment: (id: number, postId: number) => void;
   onLikeComment: (id: number, postId: number) => void;
 }

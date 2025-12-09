@@ -1,16 +1,17 @@
-import { Edit2, MessageSquare, Table, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, Button } from "../../../shared/ui";
+import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell, Button } from "../../../shared/ui";
 import { highlightText } from "../../../shared/lib";
+import { Post, User } from "../../../shared/types";
 
 interface PostsTableProps {
-  posts: any[];
+  posts: Post[];
   searchQuery: string;
   selectedTag: string;
   onTagClick: (tag: string) => void;
-  onPostDetail: (post: any) => void;
-  onEditPost: (post: any) => void;
+  onPostDetail: (post: Post) => void;
+  onEditPost: (post: Post) => void;
   onDeletePost: (id: number) => void;
-  onUserClick: (user: any) => void;
+  onUserClick: (user: User) => void;
 }
 
 export const PostsTable = ({
@@ -59,7 +60,10 @@ export const PostsTable = ({
               </div>
             </TableCell>
             <TableCell>
-              <div className="flex items-center space-x-2 cursor-pointer" onClick={() => onUserClick(post.author)}>
+              <div
+                className="flex items-center space-x-2 cursor-pointer"
+                onClick={() => post.author && onUserClick(post.author)}
+              >
                 <img src={post.author?.image} alt={post.author?.username} className="w-8 h-8 rounded-full" />
                 <span>{post.author?.username}</span>
               </div>

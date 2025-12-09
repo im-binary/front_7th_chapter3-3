@@ -1,10 +1,11 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from "../../../shared/ui";
+import { NewComment } from "../../../shared/types";
 
 interface AddCommentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  comment: { body: string; postId: number | null; userId: number };
-  onCommentChange: (comment: { body: string; postId: number | null; userId: number }) => void;
+  comment: NewComment;
+  onCommentChange: (comment: NewComment) => void;
   onSubmit: () => void;
 }
 

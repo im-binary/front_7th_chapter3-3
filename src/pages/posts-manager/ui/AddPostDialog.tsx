@@ -1,10 +1,11 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "../../../shared/ui";
+import { NewPost } from "../../../shared/types";
 
 interface AddPostDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  post: { title: string; body: string; userId: number };
-  onPostChange: (post: { title: string; body: string; userId: number }) => void;
+  post: NewPost;
+  onPostChange: (post: NewPost) => void;
   onSubmit: () => void;
 }
 
