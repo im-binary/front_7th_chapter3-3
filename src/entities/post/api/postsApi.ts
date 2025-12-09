@@ -1,4 +1,4 @@
-import { Post, PostsResponse, NewPost } from "../types";
+import { Post, PostsResponse, NewPost } from "../model/types";
 
 // Posts API
 export const postsApi = {

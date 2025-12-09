@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui";
-import { User } from "../../../shared/types";
+import type { User } from "../../../entities/user";
 
 interface UserModalProps {
   showUserModal: boolean;

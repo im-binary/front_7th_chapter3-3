@@ -1,4 +1,4 @@
-import { Tag } from "../types";
+import { Tag } from "../model/types";
 
 // Tags API
 export const tagsApi = {

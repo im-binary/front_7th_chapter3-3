@@ -1,4 +1,4 @@
-import { Comment, CommentsResponse } from "../types";
+import { Comment, CommentsResponse } from "../model/types";
 
 // Comments API
 export const commentsApi = {

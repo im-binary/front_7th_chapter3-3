@@ -1,7 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui";
 import { CommentsList } from "./CommentsList";
 import { highlightText } from "../../../shared/lib";
-import { Post, Comment } from "../../../shared/types";
+import type { Post } from "../../../entities/post";
+import type { Comment } from "../../../entities/comment";
 
 interface PostDetailDialogProps {
   showPostDetailDialog: boolean;

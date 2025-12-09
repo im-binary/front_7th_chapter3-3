@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { postsApi, usersApi, tagsApi, commentsApi } from "../../../shared/api";
-import { Post, Comment, User, Tag, NewPost, NewComment } from "../../../shared/types";
+import { postsApi, type Post, type NewPost } from "../../../entities/post";
+import { commentsApi, type Comment, type NewComment } from "../../../entities/comment";
+import { usersApi, type User } from "../../../entities/user";
+import { tagsApi, type Tag } from "../../../entities/tag";
 
 export const usePostsManager = () => {
   const navigate = useNavigate();

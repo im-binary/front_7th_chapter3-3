@@ -1,4 +1,4 @@
-import { User, UsersResponse } from "../types";
+import { User, UsersResponse } from "../model/types";
 
 // Users API
 export const usersApi = {

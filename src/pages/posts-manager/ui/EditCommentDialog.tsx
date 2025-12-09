@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from "../../../shared/ui";
-import { Comment } from "../../../shared/types";
+import type { Comment } from "../../../entities/comment";
 
 interface EditCommentDialogProps {
   open: boolean;

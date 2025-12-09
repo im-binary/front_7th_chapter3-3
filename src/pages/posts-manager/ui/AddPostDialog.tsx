@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "../../../shared/ui";
-import { NewPost } from "../../../shared/types";
+import type { NewPost } from "../../../entities/post";
 
 interface AddPostDialogProps {
   open: boolean;
