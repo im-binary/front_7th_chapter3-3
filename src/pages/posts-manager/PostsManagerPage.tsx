@@ -103,7 +103,7 @@ const PostsManager = () => {
                   className="pl-8"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && searchPosts()}
+                  onKeyUp={(e) => e.key === "Enter" && searchPosts()}
                 />
               </div>
             </div>
