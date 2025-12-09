@@ -1,9 +1,9 @@
 import { Plus } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "../../shared/ui";
-import { usePostsManager } from "./model/usePostsManager";
+import { usePostsPage } from "./model/usePostsPage";
 import { PostsTable } from "./ui/PostsTable";
-import { SearchFilters } from "./ui/SearchFilters";
-import { Pagination } from "./ui/Pagination";
+import { SearchFilters } from "../../widgets/search-filters";
+import { Pagination } from "../../widgets/pagination";
 import { PostDetailDialog } from "./ui/PostDetailDialog";
 import { UserModal } from "./ui/UserModal";
 import { AddPostDialog } from "./ui/AddPostDialog";
@@ -13,61 +13,73 @@ import { EditCommentDialog } from "./ui/EditCommentDialog";
 
 const PostsManager = () => {
   const {
-    // 상태
+    // Posts 데이터
     posts,
     total,
-    skip,
-    limit,
+    loading,
+
+    // Search & Filters
     searchQuery,
-    selectedPost,
+    setSearchQuery,
+    handleSearch,
+    selectedTag,
+    handleTagChange,
     sortBy,
     sortOrder,
-    loading,
+    handleSortChange,
     tags,
-    selectedTag,
-    comments,
-    selectedComment,
-    selectedUser,
-    newPost,
-    newComment,
-    // Dialog 상태
+
+    // Pagination
+    skip,
+    limit,
+    handlePageChange,
+    handleLimitChange,
+
+    // Comments
+    comments, // Add Post Feature
     showAddDialog,
-    showEditDialog,
-    showAddCommentDialog,
-    showEditCommentDialog,
-    showPostDetailDialog,
-    showUserModal,
-    // 상태 업데이트 함수
-    setSkip,
-    setLimit,
-    setSearchQuery,
-    setSelectedPost,
-    setSortBy,
-    setSortOrder,
-    setSelectedTag,
-    setNewPost,
-    setNewComment,
-    setSelectedComment,
     setShowAddDialog,
-    setShowEditDialog,
-    setShowAddCommentDialog,
-    setShowEditCommentDialog,
-    setShowPostDetailDialog,
-    setShowUserModal,
-    // 액션 함수
-    searchPosts,
-    fetchPostsByTag,
+    newPost,
+    setNewPost,
     addPost,
+
+    // Edit Post Feature
+    showEditDialog,
+    setShowEditDialog,
+    selectedPostForEdit,
+    setSelectedPost,
+    openEditPost,
     updatePost,
     deletePost,
+
+    // Add Comment Feature
+    showAddCommentDialog,
+    setShowAddCommentDialog,
+    newComment,
+    setNewComment,
+    openAddComment,
     addComment,
+
+    // Edit Comment Feature
+    showEditCommentDialog,
+    setShowEditCommentDialog,
+    selectedComment,
+    setSelectedComment,
+    openEditComment,
     updateComment,
     deleteComment,
     likeComment,
+
+    // Post Detail & User Modal
+    selectedPost,
     openPostDetail,
+    showPostDetailDialog,
+    setShowPostDetailDialog,
+    selectedUser,
     openUserModal,
-    updateURL,
-  } = usePostsManager();
+    showUserModal,
+    setShowUserModal,
+  } = usePostsPage();
 
   return (
     <Card className="w-full max-w-6xl mx-auto">
@@ -86,18 +98,15 @@ const PostsManager = () => {
           <SearchFilters
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            onSearch={searchPosts}
+            onSearch={handleSearch}
             selectedTag={selectedTag}
-            setSelectedTag={setSelectedTag}
+            setSelectedTag={handleTagChange}
             tags={tags}
-            onTagChange={(tag) => {
-              fetchPostsByTag(tag);
-              updateURL();
-            }}
+            onTagChange={handleTagChange}
             sortBy={sortBy}
-            setSortBy={setSortBy}
+            setSortBy={(value) => handleSortChange(value, sortOrder)}
             sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
+            setSortOrder={(value) => handleSortChange(sortBy, value)}
           />
 
           {/* 게시물 테이블 */}
@@ -108,22 +117,22 @@ const PostsManager = () => {
               posts={posts}
               searchQuery={searchQuery}
               selectedTag={selectedTag}
-              onTagClick={(tag) => {
-                setSelectedTag(tag);
-                updateURL();
-              }}
+              onTagClick={handleTagChange}
               onPostDetail={openPostDetail}
-              onEditPost={(post) => {
-                setSelectedPost(post);
-                setShowEditDialog(true);
-              }}
+              onEditPost={openEditPost}
               onDeletePost={deletePost}
               onUserClick={openUserModal}
             />
           )}
 
           {/* 페이지네이션 */}
-          <Pagination skip={skip} limit={limit} total={total} setSkip={setSkip} setLimit={setLimit} />
+          <Pagination
+            skip={skip}
+            limit={limit}
+            total={total}
+            setSkip={(value) => handlePageChange(Math.floor(value / limit) + 1)}
+            setLimit={handleLimitChange}
+          />
         </div>
       </CardContent>
 
@@ -140,7 +149,7 @@ const PostsManager = () => {
       <EditPostDialog
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
-        post={selectedPost}
+        post={selectedPostForEdit}
         onPostChange={setSelectedPost}
         onSubmit={updatePost}
       />
@@ -169,14 +178,8 @@ const PostsManager = () => {
         selectedPost={selectedPost}
         searchQuery={searchQuery}
         comments={comments}
-        onAddComment={(postId) => {
-          setNewComment((prev) => ({ ...prev, postId }));
-          setShowAddCommentDialog(true);
-        }}
-        onEditComment={(comment) => {
-          setSelectedComment(comment);
-          setShowEditCommentDialog(true);
-        }}
+        onAddComment={openAddComment}
+        onEditComment={openEditComment}
         onDeleteComment={deleteComment}
         onLikeComment={likeComment}
       />
