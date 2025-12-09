@@ -1,4 +1,4 @@
-import { Plus, Search } from "lucide-react"
+import { Plus, Search } from "lucide-react";
 import {
   Button,
   Card,
@@ -16,11 +16,11 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
-} from "../../shared/components"
-import { usePostsManager } from "./model/usePostsManager"
-import { PostsTable } from "./ui/PostsTable"
-import { CommentsList } from "./ui/CommentsList"
-import { highlightText } from "../../shared/lib"
+} from "../../shared/components";
+import { usePostsManager } from "./model/usePostsManager";
+import { PostsTable } from "./ui/PostsTable";
+import { CommentsList } from "./ui/CommentsList";
+import { highlightText } from "../../shared/lib";
 
 const PostsManager = () => {
   const {
@@ -78,7 +78,7 @@ const PostsManager = () => {
     openPostDetail,
     openUserModal,
     updateURL,
-  } = usePostsManager()
+  } = usePostsManager();
 
   return (
     <Card className="w-full max-w-6xl mx-auto">
@@ -110,9 +110,9 @@ const PostsManager = () => {
             <Select
               value={selectedTag}
               onValueChange={(value) => {
-                setSelectedTag(value)
-                fetchPostsByTag(value)
-                updateURL()
+                setSelectedTag(value);
+                fetchPostsByTag(value);
+                updateURL();
               }}
             >
               <SelectTrigger className="w-[180px]">
@@ -158,13 +158,13 @@ const PostsManager = () => {
               searchQuery={searchQuery}
               selectedTag={selectedTag}
               onTagClick={(tag) => {
-                setSelectedTag(tag)
-                updateURL()
+                setSelectedTag(tag);
+                updateURL();
               }}
               onPostDetail={openPostDetail}
               onEditPost={(post) => {
-                setSelectedPost(post)
-                setShowEditDialog(true)
+                setSelectedPost(post);
+                setShowEditDialog(true);
               }}
               onDeletePost={deletePost}
               onUserClick={openUserModal}
@@ -299,12 +299,12 @@ const PostsManager = () => {
                 comments={comments[selectedPost.id]}
                 searchQuery={searchQuery}
                 onAddComment={(postId) => {
-                  setNewComment((prev) => ({ ...prev, postId }))
-                  setShowAddCommentDialog(true)
+                  setNewComment((prev) => ({ ...prev, postId }));
+                  setShowAddCommentDialog(true);
                 }}
                 onEditComment={(comment) => {
-                  setSelectedComment(comment)
-                  setShowEditCommentDialog(true)
+                  setSelectedComment(comment);
+                  setShowEditCommentDialog(true);
                 }}
                 onDeleteComment={deleteComment}
                 onLikeComment={likeComment}
@@ -348,7 +348,7 @@ const PostsManager = () => {
         </DialogContent>
       </Dialog>
     </Card>
-  )
-}
+  );
+};
 
-export default PostsManager
+export default PostsManager;

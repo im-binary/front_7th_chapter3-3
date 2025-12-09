@@ -1,1 +1,1 @@
-export { default as PostsManagerPage } from "./PostsManagerPage"
+export { default as PostsManagerPage } from "./PostsManagerPage";

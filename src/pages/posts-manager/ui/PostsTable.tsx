@@ -1,16 +1,16 @@
-import { Edit2, MessageSquare, Table, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, Button } from "../../../shared/components"
-import { highlightText } from "../../../shared/lib"
+import { Edit2, MessageSquare, Table, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
+import { TableHeader, TableRow, TableHead, TableBody, TableCell, Button } from "../../../shared/components";
+import { highlightText } from "../../../shared/lib";
 
 interface PostsTableProps {
-  posts: any[]
-  searchQuery: string
-  selectedTag: string
-  onTagClick: (tag: string) => void
-  onPostDetail: (post: any) => void
-  onEditPost: (post: any) => void
-  onDeletePost: (id: number) => void
-  onUserClick: (user: any) => void
+  posts: any[];
+  searchQuery: string;
+  selectedTag: string;
+  onTagClick: (tag: string) => void;
+  onPostDetail: (post: any) => void;
+  onEditPost: (post: any) => void;
+  onDeletePost: (id: number) => void;
+  onUserClick: (user: any) => void;
 }
 
 export const PostsTable = ({
@@ -89,5 +89,5 @@ export const PostsTable = ({
         ))}
       </TableBody>
     </Table>
-  )
-}
+  );
+};

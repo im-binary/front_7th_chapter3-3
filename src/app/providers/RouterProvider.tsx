@@ -1,10 +1,10 @@
-import { BrowserRouter as Router } from "react-router-dom"
-import { ReactNode } from "react"
+import { BrowserRouter as Router } from "react-router-dom";
+import { ReactNode } from "react";
 
 interface RouterProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export const RouterProvider = ({ children }: RouterProviderProps) => {
-  return <Router>{children}</Router>
-}
+  return <Router>{children}</Router>;
+};

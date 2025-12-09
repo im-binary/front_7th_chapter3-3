@@ -1,7 +1,7 @@
-import { RouterProvider } from "./providers/RouterProvider"
-import Header from "../shared/components/Header"
-import Footer from "../shared/components/Footer"
-import { PostsManagerPage } from "../pages/posts-manager"
+import { RouterProvider } from "./providers/RouterProvider";
+import Header from "../shared/components/Header";
+import Footer from "../shared/components/Footer";
+import { PostsManagerPage } from "../pages/posts-manager";
 
 export const App = () => {
   return (
@@ -14,5 +14,5 @@ export const App = () => {
         <Footer />
       </div>
     </RouterProvider>
-  )
-}
+  );
+};

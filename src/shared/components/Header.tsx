@@ -1,5 +1,5 @@
-import React from "react"
-import { MessageSquare } from "lucide-react"
+import React from "react";
+import { MessageSquare } from "lucide-react";
 
 const Header: React.FC = () => {
   return (
@@ -30,7 +30,7 @@ const Header: React.FC = () => {
         </nav>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

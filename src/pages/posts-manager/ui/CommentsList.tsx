@@ -1,15 +1,15 @@
-import { Edit2, Plus, ThumbsUp, Trash2 } from "lucide-react"
-import { Button } from "../../../shared/components"
-import { highlightText } from "../../../shared/lib"
+import { Edit2, Plus, ThumbsUp, Trash2 } from "lucide-react";
+import { Button } from "../../../shared/components";
+import { highlightText } from "../../../shared/lib";
 
 interface CommentsListProps {
-  postId: number
-  comments: any[]
-  searchQuery: string
-  onAddComment: (postId: number) => void
-  onEditComment: (comment: any) => void
-  onDeleteComment: (id: number, postId: number) => void
-  onLikeComment: (id: number, postId: number) => void
+  postId: number;
+  comments: any[];
+  searchQuery: string;
+  onAddComment: (postId: number) => void;
+  onEditComment: (comment: any) => void;
+  onDeleteComment: (id: number, postId: number) => void;
+  onLikeComment: (id: number, postId: number) => void;
 }
 
 export const CommentsList = ({
@@ -53,5 +53,5 @@ export const CommentsList = ({
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
