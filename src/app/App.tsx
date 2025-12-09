@@ -1,6 +1,6 @@
 import { RouterProvider } from "./providers/RouterProvider";
-import Header from "../shared/components/Header";
-import Footer from "../shared/components/Footer";
+import Header from "../shared/ui/Header";
+import Footer from "../shared/ui/Footer";
 import { PostsManagerPage } from "../pages/posts-manager";
 
 export const App = () => {

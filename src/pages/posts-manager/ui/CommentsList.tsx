@@ -1,5 +1,5 @@
 import { Edit2, Plus, ThumbsUp, Trash2 } from "lucide-react";
-import { Button } from "../../../shared/components";
+import { Button } from "../../../shared/ui";
 import { highlightText } from "../../../shared/lib";
 
 interface CommentsListProps {

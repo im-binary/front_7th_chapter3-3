@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
-} from "../../shared/components";
+} from "../../shared/ui";
 import { usePostsManager } from "./model/usePostsManager";
 import { PostsTable } from "./ui/PostsTable";
 import { CommentsList } from "./ui/CommentsList";
