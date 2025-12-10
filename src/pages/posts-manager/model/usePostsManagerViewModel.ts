@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { buildQueryString, parseQueryString } from "../../../shared/lib";
+import { usePosts, useSearchPosts, usePostsByTag } from "../../../features/manage-posts";
 
 // Types
 import type { Post } from "../../../entities/post";
@@ -21,13 +22,46 @@ export const usePostsManagerViewModel = () => {
     };
   }, [location.search]);
 
-  // 검색 쿼리는 controlled input을 위해 별도 상태 필요
   const [searchQuery, setSearchQuery] = useState(urlParams.search);
 
   // 모달 상태
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
+  const { data: searchData, isLoading: searchLoading } = useSearchPosts(urlParams.search);
+  const { data: tagData, isLoading: tagLoading } = usePostsByTag(urlParams.tag, urlParams.limit, urlParams.skip);
+  const { data: defaultPostsData, isLoading: defaultLoading } = usePosts(urlParams.limit, urlParams.skip);
+
+  // 우선순위: 검색 > 태그 > 기본
+  const rawPostsData = urlParams.search
+    ? searchData
+    : urlParams.tag && urlParams.tag !== "all"
+      ? tagData
+      : defaultPostsData;
+
+  const postsLoading = urlParams.search
+    ? searchLoading
+    : urlParams.tag && urlParams.tag !== "all"
+      ? tagLoading
+      : defaultLoading;
+
+  // 정렬 적용
+  const posts = rawPostsData
+    ? [...rawPostsData.posts].sort((a, b) => {
+        if (!urlParams.sortBy) return 0;
+
+        const aValue = a[urlParams.sortBy as keyof Post];
+        const bValue = b[urlParams.sortBy as keyof Post];
+
+        if (aValue === undefined || bValue === undefined) return 0;
+
+        const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+        return urlParams.sortOrder === "desc" ? -comparison : comparison;
+      })
+    : [];
+
+  const postsTotal = rawPostsData?.total || 0;
 
   // URL 업데이트 함수
   const updateURL = (updates: Record<string, string | number> = {}) => {
@@ -43,7 +77,6 @@ export const usePostsManagerViewModel = () => {
     navigate(`?${queryString}`);
   };
 
-  // 핸들러 함수들
   const handlePostDetail = (post: Post) => {
     setSelectedPost(post);
     setShowPostDetailDialog(true);
@@ -65,6 +98,11 @@ export const usePostsManagerViewModel = () => {
     updateURL,
     handleSearch,
     handleTagChange,
+
+    // Posts Data
+    posts,
+    postsLoading,
+    postsTotal,
 
     // 모달 상태
     showPostDetailDialog,

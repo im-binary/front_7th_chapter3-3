@@ -1,8 +1,14 @@
 import { Plus } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "../../../shared/ui";
 
-import { usePosts, useDeletePost } from "../../../features/manage-posts";
-import { useComments, useDeleteComment, useLikeComment } from "../../../features/manage-comments";
+import { useDeletePost, useAddPost as useAddPostMutation, useUpdatePost } from "../../../features/manage-posts";
+import {
+  useComments,
+  useDeleteComment,
+  useLikeComment,
+  useAddComment as useAddCommentMutation,
+  useUpdateComment,
+} from "../../../features/manage-comments";
 import { useTags } from "../../../features/manage-tags";
 import { useUserDetail } from "../../../features/view-user-detail";
 import { useAddPost, AddPostDialog } from "../../../features/add-post";
@@ -40,17 +46,23 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
     setShowUserModal,
     selectedPost,
     handlePostDetail,
+    posts,
+    postsLoading,
+    postsTotal,
   } = viewModel;
 
-  const { data: postsData, isLoading: postsLoading } = usePosts(urlParams.limit, urlParams.skip);
   const { data: tags = [] } = useTags();
   const { data: selectedUser } = useUserDetail(showUserModal ? selectedPost?.userId || null : null);
   const { data: comments = [] } = useComments(selectedPost?.id || 0);
 
   // Mutations
   const deletePostMutation = useDeletePost();
+  const addPostMutation = useAddPostMutation();
+  const updatePostMutation = useUpdatePost();
   const deleteCommentMutation = useDeleteComment();
   const likeCommentMutation = useLikeComment();
+  const addCommentMutation = useAddCommentMutation();
+  const updateCommentMutation = useUpdateComment();
 
   // Feature Hooks (Dialog 상태 관리용)
   const addPostFeature = useAddPost();
@@ -73,23 +85,48 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
   };
 
   const handleEditPostSubmit = async () => {
-    if (!editPostFeature.selectedPost) return;
+    if (!editPostFeature.selectedPost) {
+      return;
+    }
+
+    await updatePostMutation.mutateAsync({
+      id: editPostFeature.selectedPost.id,
+      post: {
+        title: editPostFeature.selectedPost.title,
+        body: editPostFeature.selectedPost.body,
+      },
+    });
+
     editPostFeature.setOpen(false);
   };
 
   const handleAddPostSubmit = async () => {
+    await addPostMutation.mutateAsync(addPostFeature.formData);
+
     addPostFeature.setOpen(false);
     addPostFeature.setFormData({ title: "", body: "", userId: 1 });
   };
 
   const handleAddComment = () => {
-    if (!selectedPost) return;
+    if (!selectedPost) {
+      return;
+    }
+
     addCommentFeature.setFormData({ ...addCommentFeature.formData, postId: selectedPost.id });
     addCommentFeature.setOpen(true);
   };
 
   const handleAddCommentSubmit = async () => {
-    if (addCommentFeature.formData.postId === null) return;
+    if (addCommentFeature.formData.postId === null) {
+      return;
+    }
+
+    await addCommentMutation.mutateAsync({
+      body: addCommentFeature.formData.body,
+      postId: addCommentFeature.formData.postId,
+      userId: addCommentFeature.formData.userId,
+    });
+
     addCommentFeature.setOpen(false);
     addCommentFeature.setFormData({ body: "", postId: null, userId: 1 });
   };
@@ -100,7 +137,16 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
   };
 
   const handleEditCommentSubmit = async () => {
-    if (!editCommentFeature.selectedComment) return;
+    if (!editCommentFeature.selectedComment) {
+      return;
+    }
+
+    await updateCommentMutation.mutateAsync({
+      id: editCommentFeature.selectedComment.id,
+      body: editCommentFeature.selectedComment.body,
+      postId: editCommentFeature.selectedComment.postId,
+    });
+
     editCommentFeature.setOpen(false);
   };
 
@@ -144,7 +190,7 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
             <div className="flex justify-center p-4">로딩 중...</div>
           ) : (
             <PostsTable
-              posts={postsData?.posts || []}
+              posts={posts}
               searchQuery={searchQuery}
               selectedTag={urlParams.tag}
               onTagSelect={handleTagChange}
@@ -159,7 +205,7 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
           <PaginationControls
             skip={urlParams.skip}
             limit={urlParams.limit}
-            total={postsData?.total || 0}
+            total={postsTotal}
             onLimitChange={(newLimit) => updateURL({ limit: newLimit, skip: 0 })}
             onPrevious={() => updateURL({ skip: Math.max(0, urlParams.skip - urlParams.limit) })}
             onNext={() => updateURL({ skip: urlParams.skip + urlParams.limit })}
