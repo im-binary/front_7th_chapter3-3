@@ -5,6 +5,14 @@ import { postsApi } from "../../../entities/post/api/postsApi";
 import { usersApi } from "../../../entities/user/api/usersApi";
 import { postsKeys } from "../../../shared/api/queryKeys";
 
+/**
+ * Posts 조회 (페이지네이션)
+ *
+ * 캐싱 전략:
+ * - staleTime: 2분 - 게시글은 자주 변경되지 않지만 새 글이 추가될 수 있음
+ * - gcTime: 5분 - 페이지별로 캐시 유지 (사용자가 앞뒤 페이지 이동 시 즉시 표시)
+ * - refetchOnWindowFocus: true - 탭 복귀 시 최신 데이터 확인
+ */
 export const usePosts = (limit: number, skip: number) => {
   return useQuery({
     queryKey: postsKeys.list({ skip, limit }),
@@ -21,9 +29,19 @@ export const usePosts = (limit: number, skip: number) => {
         total: postsResponse.total,
       };
     },
+    staleTime: 1000 * 60 * 2, // 2분
+    gcTime: 1000 * 60 * 5, // 5분
   });
 };
 
+/**
+ * Posts 검색
+ *
+ * 캐싱 전략:
+ * - staleTime: 1분 - 검색 결과는 빠르게 stale 처리
+ * - enabled: query 있을 때만 실행
+ * - 검색어별로 별도 캐시 유지
+ */
 export const useSearchPosts = (query: string) => {
   return useQuery({
     queryKey: postsKeys.search(query),
@@ -35,10 +53,19 @@ export const useSearchPosts = (query: string) => {
       };
     },
     enabled: !!query,
-    staleTime: 1000 * 60 * 3,
+    staleTime: 1000 * 60, // 1분
+    gcTime: 1000 * 60 * 3, // 3분
   });
 };
 
+/**
+ * 태그별 Posts 조회
+ *
+ * 캐싱 전략:
+ * - staleTime: 2분 - 일반 목록과 동일
+ * - enabled: tag가 'all'이 아닐 때만 실행
+ * - 태그별로 독립적인 캐시 유지
+ */
 export const usePostsByTag = (tag: string, limit = 10, skip = 0) => {
   return useQuery({
     queryKey: postsKeys.byTag(tag),
@@ -59,6 +86,8 @@ export const usePostsByTag = (tag: string, limit = 10, skip = 0) => {
       };
     },
     enabled: !!tag && tag !== "all",
+    staleTime: 1000 * 60 * 2, // 2분
+    gcTime: 1000 * 60 * 5, // 5분
   });
 };
 

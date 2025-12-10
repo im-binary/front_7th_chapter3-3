@@ -6,7 +6,8 @@ import { commentsKeys } from "../../../shared/api/queryKeys";
  * 게시글별 댓글 조회
  *
  * 캐싱 전략:
- * - staleTime: 3분 (댓글은 비교적 자주 변경될 수 있음)
+ * - staleTime: 30초 - 댓글은 실시간성이 중요 (추가/수정/삭제 빈번)
+ * - gcTime: 3분 - 짧은 시간 동안만 캐시 유지
  */
 export const useComments = (postId: number) => {
   return useQuery({
@@ -15,8 +16,10 @@ export const useComments = (postId: number) => {
       const data = await commentsApi.getComments(postId);
       return data.comments;
     },
-    enabled: !!postId, // postId가 있을 때만 실행
-    staleTime: 1000 * 60 * 3, // 3분
+    enabled: !!postId,
+    staleTime: 1000 * 30, // 30초
+    gcTime: 1000 * 60 * 3, // 3분
+    refetchOnWindowFocus: true, // 탭 복귀 시 최신 댓글 확인
   });
 };
 
