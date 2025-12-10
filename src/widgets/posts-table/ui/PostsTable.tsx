@@ -1,28 +1,29 @@
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../shared/ui";
 import { highlightText } from "../../../shared/lib";
-import { usePostsContext } from "../../../app/providers/PostsProvider";
 import type { Post } from "../../../entities/post";
 
 interface PostsTableProps {
+  posts: Post[];
   searchQuery: string;
   selectedTag: string;
   onTagSelect: (tag: string) => void;
   onPostDetail: (post: Post) => void;
   onEditPost: (post: Post) => void;
+  onDeletePost: (id: number) => Promise<void>;
   onUserClick: (userId: number) => void;
 }
 
 export const PostsTable = ({
+  posts,
   searchQuery,
   selectedTag,
   onTagSelect,
   onPostDetail,
   onEditPost,
+  onDeletePost,
   onUserClick,
 }: PostsTableProps) => {
-  const { posts, deletePost } = usePostsContext();
-
   return (
     <Table>
       <TableHeader>
@@ -86,7 +87,7 @@ export const PostsTable = ({
                 </Button>
 
                 {/* 댓글 삭제 버튼 */}
-                <Button variant="ghost" size="sm" onClick={() => deletePost(post.id)}>
+                <Button variant="ghost" size="sm" onClick={() => onDeletePost(post.id)}>
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>

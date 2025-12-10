@@ -1,8 +1,6 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { buildQueryString, parseQueryString } from "../../../shared/lib";
-import { usePostsContext } from "../../../app/providers/PostsProvider";
-import { useCommentsContext } from "../../../app/providers/CommentsProvider";
 
 // Types
 import type { Post } from "../../../entities/post";
@@ -10,9 +8,6 @@ import type { Post } from "../../../entities/post";
 export const usePostsManagerViewModel = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const postsFeature = usePostsContext();
-  const commentsFeature = useCommentsContext();
 
   const urlParams = useMemo(() => {
     const params = parseQueryString(location.search);
@@ -48,24 +43,9 @@ export const usePostsManagerViewModel = () => {
     navigate(`?${queryString}`);
   };
 
-  // URL 변경 시 데이터 fetch
-  useEffect(() => {
-    setSearchQuery(urlParams.search);
-
-    if (urlParams.search) {
-      postsFeature.searchPosts(urlParams.search);
-    } else if (urlParams.tag && urlParams.tag !== "all") {
-      postsFeature.fetchPostsByTag(urlParams.tag, urlParams.limit, urlParams.skip);
-    } else {
-      postsFeature.fetchPosts(urlParams.limit, urlParams.skip);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search]);
-
   // 핸들러 함수들
   const handlePostDetail = (post: Post) => {
     setSelectedPost(post);
-    commentsFeature.fetchComments(post.id);
     setShowPostDetailDialog(true);
   };
 
@@ -93,9 +73,5 @@ export const usePostsManagerViewModel = () => {
     setShowUserModal,
     selectedPost,
     handlePostDetail,
-
-    // Posts 데이터
-    postsLoading: postsFeature.loading,
-    postsTotal: postsFeature.total,
   };
 };

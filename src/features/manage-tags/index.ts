@@ -1,1 +1,1 @@
-export { useTags } from "./model/useTags";
+export { useTags } from "./hooks/useTagsQuery";

@@ -1,15 +1,14 @@
 import { Plus } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "../../../shared/ui";
 
-// Features
+import { usePosts, useDeletePost } from "../../../features/manage-posts";
+import { useComments, useDeleteComment, useLikeComment } from "../../../features/manage-comments";
+import { useTags } from "../../../features/manage-tags";
+import { useUserDetail } from "../../../features/view-user-detail";
 import { useAddPost, AddPostDialog } from "../../../features/add-post";
 import { useEditPost, EditPostDialog } from "../../../features/edit-post";
 import { useAddComment, AddCommentDialog } from "../../../features/add-comment";
 import { useEditComment, EditCommentDialog } from "../../../features/edit-comment";
-import { usePostsContext } from "../../../app/providers/PostsProvider";
-import { useCommentsContext } from "../../../app/providers/CommentsProvider";
-import { useTags } from "../../../features/manage-tags";
-import { useUserDetail } from "../../../features/view-user-detail";
 
 // Widgets
 import { SearchFilters } from "../../../widgets/search-filters";
@@ -41,23 +40,31 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
     setShowUserModal,
     selectedPost,
     handlePostDetail,
-    postsLoading,
-    postsTotal,
   } = viewModel;
 
-  const postsFeature = usePostsContext();
-  const commentsFeature = useCommentsContext();
-  const { tags } = useTags();
-  const { selectedUser, fetchUser } = useUserDetail();
+  const { data: postsData, isLoading: postsLoading } = usePosts(urlParams.limit, urlParams.skip);
+  const { data: tags = [] } = useTags();
+  const { data: selectedUser } = useUserDetail(showUserModal ? selectedPost?.userId || null : null);
+  const { data: comments = [] } = useComments(selectedPost?.id || 0);
+
+  // Mutations
+  const deletePostMutation = useDeletePost();
+  const deleteCommentMutation = useDeleteComment();
+  const likeCommentMutation = useLikeComment();
+
+  // Feature Hooks (Dialog 상태 관리용)
   const addPostFeature = useAddPost();
   const editPostFeature = useEditPost();
   const addCommentFeature = useAddComment();
   const editCommentFeature = useEditComment();
 
   // Feature를 사용하는 핸들러들
-  const handleUserClick = async (userId: number) => {
-    await fetchUser(userId);
+  const handleUserClick = () => {
     setShowUserModal(true);
+  };
+
+  const handleDeletePost = async (id: number): Promise<void> => {
+    await deletePostMutation.mutateAsync(id);
   };
 
   const handleEditPost = (post: Post) => {
@@ -67,15 +74,10 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
 
   const handleEditPostSubmit = async () => {
     if (!editPostFeature.selectedPost) return;
-    await postsFeature.updatePost(editPostFeature.selectedPost.id, {
-      title: editPostFeature.selectedPost.title,
-      body: editPostFeature.selectedPost.body,
-    });
     editPostFeature.setOpen(false);
   };
 
   const handleAddPostSubmit = async () => {
-    await postsFeature.addPost(addPostFeature.formData);
     addPostFeature.setOpen(false);
     addPostFeature.setFormData({ title: "", body: "", userId: 1 });
   };
@@ -88,11 +90,6 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
 
   const handleAddCommentSubmit = async () => {
     if (addCommentFeature.formData.postId === null) return;
-    await commentsFeature.addComment({
-      body: addCommentFeature.formData.body,
-      postId: addCommentFeature.formData.postId,
-      userId: addCommentFeature.formData.userId,
-    });
     addCommentFeature.setOpen(false);
     addCommentFeature.setFormData({ body: "", postId: null, userId: 1 });
   };
@@ -104,12 +101,15 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
 
   const handleEditCommentSubmit = async () => {
     if (!editCommentFeature.selectedComment) return;
-    await commentsFeature.updateComment(
-      editCommentFeature.selectedComment.id,
-      editCommentFeature.selectedComment.body,
-      editCommentFeature.selectedComment.postId,
-    );
     editCommentFeature.setOpen(false);
+  };
+
+  const handleDeleteComment = async (id: number) => {
+    await deleteCommentMutation.mutateAsync(id);
+  };
+
+  const handleLikeComment = async (id: number, currentLikes: number) => {
+    await likeCommentMutation.mutateAsync({ id, currentLikes });
   };
 
   return (
@@ -144,11 +144,13 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
             <div className="flex justify-center p-4">로딩 중...</div>
           ) : (
             <PostsTable
+              posts={postsData?.posts || []}
               searchQuery={searchQuery}
               selectedTag={urlParams.tag}
               onTagSelect={handleTagChange}
               onPostDetail={handlePostDetail}
               onEditPost={handleEditPost}
+              onDeletePost={handleDeletePost}
               onUserClick={handleUserClick}
             />
           )}
@@ -157,7 +159,7 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
           <PaginationControls
             skip={urlParams.skip}
             limit={urlParams.limit}
-            total={postsTotal}
+            total={postsData?.total || 0}
             onLimitChange={(newLimit) => updateURL({ limit: newLimit, skip: 0 })}
             onPrevious={() => updateURL({ skip: Math.max(0, urlParams.skip - urlParams.limit) })}
             onNext={() => updateURL({ skip: urlParams.skip + urlParams.limit })}
@@ -206,9 +208,12 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
         open={showPostDetailDialog}
         onOpenChange={setShowPostDetailDialog}
         post={selectedPost}
+        comments={comments}
         searchQuery={searchQuery}
         onAddComment={handleAddComment}
         onEditComment={handleEditComment}
+        onDeleteComment={handleDeleteComment}
+        onLikeComment={handleLikeComment}
       />
 
       {/* 사용자 모달 */}

@@ -4,7 +4,7 @@ import type { User } from "../../../entities/user";
 interface UserModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: User | null;
+  user?: User | null;
 }
 
 export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {

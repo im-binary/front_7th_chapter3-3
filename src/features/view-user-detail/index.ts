@@ -1,1 +1,1 @@
-export { useUserDetail } from "./model/useUserDetail";
+export { useUserDetail } from "./hooks/useUserDetailQuery";

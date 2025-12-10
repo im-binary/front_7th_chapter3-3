@@ -8,8 +8,8 @@ interface CommentsListProps {
   searchQuery: string;
   onAddComment: () => void;
   onEditComment: (comment: Comment) => void;
-  onDeleteComment: (commentId: number) => void;
-  onLikeComment: (commentId: number) => void;
+  onDeleteComment: (commentId: number) => Promise<void>;
+  onLikeComment: (commentId: number, currentLikes: number) => Promise<void>;
 }
 
 export const CommentsList = ({
@@ -38,7 +38,7 @@ export const CommentsList = ({
             </div>
             <div className="flex items-center space-x-1">
               {/* 좋아요 버튼 */}
-              <Button variant="ghost" size="sm" onClick={() => onLikeComment(comment.id)}>
+              <Button variant="ghost" size="sm" onClick={() => onLikeComment(comment.id, comment.likes)}>
                 <ThumbsUp className="w-3 h-3" />
                 <span className="ml-1 text-xs">{comment.likes}</span>
               </Button>

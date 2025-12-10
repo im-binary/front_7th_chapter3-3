@@ -1,1 +1,8 @@
-export { usePosts } from "./model/usePosts";
+export {
+  usePosts,
+  useSearchPosts,
+  usePostsByTag,
+  useDeletePost,
+  useAddPost,
+  useUpdatePost,
+} from "./hooks/usePostsQuery";
