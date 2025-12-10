@@ -4,17 +4,15 @@ import { highlightText } from "../../../shared/lib";
 import type { Comment } from "../../../entities/comment";
 
 interface CommentsListProps {
-  postId: number;
   comments: Comment[];
   searchQuery: string;
-  onAddComment: (postId: number) => void;
+  onAddComment: () => void;
   onEditComment: (comment: Comment) => void;
-  onDeleteComment: (id: number, postId: number) => void;
-  onLikeComment: (id: number, postId: number) => void;
+  onDeleteComment: (commentId: number) => void;
+  onLikeComment: (commentId: number) => void;
 }
 
 export const CommentsList = ({
-  postId,
   comments,
   searchQuery,
   onAddComment,
@@ -26,7 +24,7 @@ export const CommentsList = ({
     <div className="mt-2">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-semibold">댓글</h3>
-        <Button size="sm" onClick={() => onAddComment(postId)}>
+        <Button size="sm" onClick={onAddComment}>
           <Plus className="w-3 h-3 mr-1" />
           댓글 추가
         </Button>
@@ -39,14 +37,17 @@ export const CommentsList = ({
               <span className="truncate">{highlightText(comment.body, searchQuery)}</span>
             </div>
             <div className="flex items-center space-x-1">
-              <Button variant="ghost" size="sm" onClick={() => onLikeComment(comment.id, postId)}>
+              {/* 좋아요 버튼 */}
+              <Button variant="ghost" size="sm" onClick={() => onLikeComment(comment.id)}>
                 <ThumbsUp className="w-3 h-3" />
                 <span className="ml-1 text-xs">{comment.likes}</span>
               </Button>
+              {/* 편집 버튼 */}
               <Button variant="ghost" size="sm" onClick={() => onEditComment(comment)}>
                 <Edit2 className="w-3 h-3" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => onDeleteComment(comment.id, postId)}>
+              {/* 삭제 버튼 */}
+              <Button variant="ghost" size="sm" onClick={() => onDeleteComment(comment.id)}>
                 <Trash2 className="w-3 h-3" />
               </Button>
             </div>

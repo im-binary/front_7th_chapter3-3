@@ -16,6 +16,8 @@ export const EditCommentDialog = ({
   onCommentChange,
   onSubmit,
 }: EditCommentDialogProps) => {
+  if (!comment) return null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -25,8 +27,8 @@ export const EditCommentDialog = ({
         <div className="space-y-4">
           <Textarea
             placeholder="댓글 내용"
-            value={comment?.body || ""}
-            onChange={(e) => onCommentChange({ ...comment!, body: e.target.value })}
+            value={comment.body || ""}
+            onChange={(e) => onCommentChange({ ...comment, body: e.target.value })}
           />
           <Button onClick={onSubmit}>댓글 업데이트</Button>
         </div>

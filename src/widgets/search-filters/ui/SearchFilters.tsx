@@ -1,32 +1,31 @@
 import { Search } from "lucide-react";
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../shared/ui";
+import type { Tag } from "../../../entities/tag";
 
 interface SearchFiltersProps {
   searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  onSearch: () => void;
   selectedTag: string;
-  setSelectedTag: (tag: string) => void;
-  tags: any[];
-  onTagChange: (tag: string) => void;
   sortBy: string;
-  setSortBy: (sortBy: string) => void;
   sortOrder: string;
-  setSortOrder: (sortOrder: string) => void;
+  tags: Tag[];
+  onSearchChange: (value: string) => void;
+  onSearchSubmit: () => void;
+  onTagChange: (value: string) => void;
+  onSortByChange: (value: string) => void;
+  onSortOrderChange: (value: string) => void;
 }
 
 export const SearchFilters = ({
   searchQuery,
-  setSearchQuery,
-  onSearch,
   selectedTag,
-  setSelectedTag,
-  tags,
-  onTagChange,
   sortBy,
-  setSortBy,
   sortOrder,
-  setSortOrder,
+  tags,
+  onSearchChange,
+  onSearchSubmit,
+  onTagChange,
+  onSortByChange,
+  onSortOrderChange,
 }: SearchFiltersProps) => {
   return (
     <div className="flex gap-4">
@@ -37,18 +36,12 @@ export const SearchFilters = ({
             placeholder="게시물 검색..."
             className="pl-8"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyUp={(e) => e.key === "Enter" && onSearch()}
+            onChange={(e) => onSearchChange(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && onSearchSubmit()}
           />
         </div>
       </div>
-      <Select
-        value={selectedTag}
-        onValueChange={(value) => {
-          setSelectedTag(value);
-          onTagChange(value);
-        }}
-      >
+      <Select value={selectedTag} onValueChange={onTagChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="태그 선택" />
         </SelectTrigger>
@@ -61,7 +54,7 @@ export const SearchFilters = ({
           ))}
         </SelectContent>
       </Select>
-      <Select value={sortBy} onValueChange={setSortBy}>
+      <Select value={sortBy} onValueChange={onSortByChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 기준" />
         </SelectTrigger>
@@ -72,7 +65,7 @@ export const SearchFilters = ({
           <SelectItem value="reactions">반응</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={sortOrder} onValueChange={setSortOrder}>
+      <Select value={sortOrder} onValueChange={onSortOrderChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 순서" />
         </SelectTrigger>
