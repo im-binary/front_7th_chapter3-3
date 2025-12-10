@@ -104,13 +104,16 @@ export const useDeletePost = () => {
       const previousPosts = queryClient.getQueriesData({ queryKey: postsKeys.all });
 
       // 낙관적 업데이트: 모든 posts 쿼리에서 해당 post 제거
-      queryClient.setQueriesData({ queryKey: postsKeys.all }, (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          posts: old.posts.filter((post: Post) => post.id !== id),
-          total: old.total - 1,
-        };
+      queryClient.setQueriesData({ queryKey: postsKeys.all }, (old: unknown) => {
+        if (!old || typeof old !== "object") return old;
+        if ("posts" in old && Array.isArray(old.posts) && "total" in old) {
+          return {
+            ...old,
+            posts: old.posts.filter((post: Post) => post.id !== id),
+            total: (old.total as number) - 1,
+          };
+        }
+        return old;
       });
 
       return { previousPosts };
@@ -122,10 +125,6 @@ export const useDeletePost = () => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-    },
-    onSettled: () => {
-      // 성공/실패 여부와 관계없이 서버 데이터로 재조회
-      queryClient.invalidateQueries({ queryKey: postsKeys.all });
     },
   });
 };
@@ -149,13 +148,16 @@ export const useAddPost = () => {
         views: 0,
       };
 
-      queryClient.setQueriesData({ queryKey: postsKeys.lists() }, (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          posts: [optimisticPost, ...old.posts],
-          total: old.total + 1,
-        };
+      queryClient.setQueriesData({ queryKey: postsKeys.lists() }, (old: unknown) => {
+        if (!old || typeof old !== "object") return old;
+        if ("posts" in old && Array.isArray(old.posts) && "total" in old) {
+          return {
+            ...old,
+            posts: [optimisticPost, ...old.posts],
+            total: (old.total as number) + 1,
+          };
+        }
+        return old;
       });
 
       return { previousPosts };
@@ -166,9 +168,6 @@ export const useAddPost = () => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: postsKeys.lists() });
     },
   });
 };
@@ -184,12 +183,15 @@ export const useUpdatePost = () => {
       const previousPosts = queryClient.getQueriesData({ queryKey: postsKeys.all });
 
       // 낙관적 업데이트: 제목과 본문만 즉시 변경
-      queryClient.setQueriesData({ queryKey: postsKeys.all }, (old: any) => {
-        if (!old) return old;
-        return {
-          ...old,
-          posts: old.posts.map((p: Post) => (p.id === id ? { ...p, ...post } : p)),
-        };
+      queryClient.setQueriesData({ queryKey: postsKeys.all }, (old: unknown) => {
+        if (!old || typeof old !== "object") return old;
+        if ("posts" in old && Array.isArray(old.posts)) {
+          return {
+            ...old,
+            posts: old.posts.map((p: Post) => (p.id === id ? { ...p, ...post } : p)),
+          };
+        }
+        return old;
       });
 
       return { previousPosts };
@@ -200,10 +202,6 @@ export const useUpdatePost = () => {
           queryClient.setQueryData(queryKey, data);
         });
       }
-    },
-    onSettled: (_data, _error, { id }) => {
-      queryClient.invalidateQueries({ queryKey: postsKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: postsKeys.lists() });
     },
   });
 };
