@@ -48,11 +48,43 @@ export const useComments = () => {
     }
   };
 
+  // 댓글 추가
+  const addComment = async (comment: { body: string; postId: number; userId: number }) => {
+    try {
+      const data = await commentsApi.addComment(comment);
+      setComments((prev) => ({
+        ...prev,
+        [data.postId]: [...(prev[data.postId] || []), data],
+      }));
+      return data;
+    } catch (error) {
+      console.error("댓글 추가 오류:", error);
+      throw error;
+    }
+  };
+
+  // 댓글 수정
+  const updateComment = async (id: number, body: string, postId: number) => {
+    try {
+      const data = await commentsApi.updateComment(id, body);
+      setComments((prev) => ({
+        ...prev,
+        [postId]: prev[postId].map((comment) => (comment.id === data.id ? data : comment)),
+      }));
+      return data;
+    } catch (error) {
+      console.error("댓글 수정 오류:", error);
+      throw error;
+    }
+  };
+
   return {
     comments,
     fetchComments,
     deleteComment,
     likeComment,
+    addComment,
+    updateComment,
     setComments,
   };
 };

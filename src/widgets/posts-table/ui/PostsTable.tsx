@@ -1,29 +1,28 @@
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react";
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../shared/ui";
 import { highlightText } from "../../../shared/lib";
+import { usePostsContext } from "../../../app/providers/PostsProvider";
 import type { Post } from "../../../entities/post";
 
 interface PostsTableProps {
-  posts: Post[];
   searchQuery: string;
   selectedTag: string;
   onTagSelect: (tag: string) => void;
   onPostDetail: (post: Post) => void;
   onEditPost: (post: Post) => void;
-  onDeletePost: (id: number) => void;
   onUserClick: (userId: number) => void;
 }
 
 export const PostsTable = ({
-  posts,
   searchQuery,
   selectedTag,
   onTagSelect,
   onPostDetail,
   onEditPost,
-  onDeletePost,
   onUserClick,
 }: PostsTableProps) => {
+  const { posts, deletePost } = usePostsContext();
+
   return (
     <Table>
       <TableHeader>
@@ -39,6 +38,7 @@ export const PostsTable = ({
         {posts.map((post) => (
           <TableRow key={post.id}>
             <TableCell>{post.id}</TableCell>
+
             <TableCell>
               <div className="space-y-1">
                 <div>{highlightText(post.title, searchQuery)}</div>
@@ -59,6 +59,7 @@ export const PostsTable = ({
                 </div>
               </div>
             </TableCell>
+
             <TableCell>
               <div className="flex items-center space-x-2 cursor-pointer" onClick={() => onUserClick(post.userId)}>
                 <img src={post.author?.image} alt={post.author?.username} className="w-8 h-8 rounded-full" />
@@ -74,14 +75,18 @@ export const PostsTable = ({
               </div>
             </TableCell>
             <TableCell>
+              {/* 댓글 보기 버튼 */}
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={() => onPostDetail(post)}>
                   <MessageSquare className="w-4 h-4" />
                 </Button>
+                {/* 댓글 추가 버튼 */}
                 <Button variant="ghost" size="sm" onClick={() => onEditPost(post)}>
                   <Edit2 className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => onDeletePost(post.id)}>
+
+                {/* 댓글 삭제 버튼 */}
+                <Button variant="ghost" size="sm" onClick={() => deletePost(post.id)}>
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>

@@ -15,8 +15,8 @@ export const postsApi = {
   },
 
   // 태그별 게시물 가져오기
-  getPostsByTag: async (tag: string): Promise<PostsResponse> => {
-    const response = await fetch(`/api/posts/tag/${tag}`);
+  getPostsByTag: async (tag: string, limit = 10, skip = 0): Promise<PostsResponse> => {
+    const response = await fetch(`/api/posts/tag/${tag}?limit=${limit}&skip=${skip}`);
     return response.json();
   },
 
