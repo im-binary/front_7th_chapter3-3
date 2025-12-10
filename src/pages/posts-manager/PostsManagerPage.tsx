@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "../../shared/ui";
+import { buildQueryString } from "../../shared/lib";
 
 // Features
 import { useAddPost, AddPostDialog } from "../../features/add-post";
@@ -62,14 +63,16 @@ const PostsManagerPage = () => {
 
   // URL 업데이트 함수
   const updateURL = () => {
-    const params = new URLSearchParams();
-    if (skip) params.set("skip", skip.toString());
-    if (limit) params.set("limit", limit.toString());
-    if (searchQuery) params.set("search", searchQuery);
-    if (sortBy) params.set("sortBy", sortBy);
-    if (sortOrder) params.set("sortOrder", sortOrder);
-    if (selectedTag) params.set("tag", selectedTag);
-    navigate(`?${params.toString()}`);
+    const queryString = buildQueryString({
+      skip,
+      limit,
+      search: searchQuery,
+      sortBy,
+      sortOrder,
+      tag: selectedTag,
+    });
+
+    navigate(`?${queryString}`);
   };
 
   // 게시물 상세 보기
