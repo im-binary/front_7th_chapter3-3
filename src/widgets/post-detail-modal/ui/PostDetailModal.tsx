@@ -9,6 +9,8 @@ interface PostDetailModalProps {
   onOpenChange: (open: boolean) => void;
   post: Post | null;
   comments: Comment[];
+  commentsLoading: boolean;
+  commentsError: boolean;
   searchQuery: string;
   onAddComment: () => void;
   onEditComment: (comment: Comment) => void;
@@ -21,6 +23,8 @@ export const PostDetailModal = ({
   onOpenChange,
   post,
   comments,
+  commentsLoading,
+  commentsError,
   searchQuery,
   onAddComment,
   onEditComment,
@@ -41,14 +45,33 @@ export const PostDetailModal = ({
         <div className="space-y-4">
           <p>{highlightText(post.body, searchQuery)}</p>
 
-          <CommentsList
-            comments={comments}
-            searchQuery={searchQuery}
-            onAddComment={onAddComment}
-            onEditComment={onEditComment}
-            onDeleteComment={onDeleteComment}
-            onLikeComment={onLikeComment}
-          />
+          {(() => {
+            if (commentsLoading) {
+              return <div className="flex justify-center p-4 text-gray-500">댓글 로딩 중...</div>;
+            }
+
+            if (commentsError) {
+              return (
+                <div className="flex flex-col items-center p-4 text-red-600 space-y-2">
+                  <p>댓글을 불러오는데 실패했습니다.</p>
+                  <button onClick={() => window.location.reload()} className="text-sm underline hover:no-underline">
+                    새로고침
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <CommentsList
+                comments={comments}
+                searchQuery={searchQuery}
+                onAddComment={onAddComment}
+                onEditComment={onEditComment}
+                onDeleteComment={onDeleteComment}
+                onLikeComment={onLikeComment}
+              />
+            );
+          })()}
         </div>
       </DialogContent>
     </Dialog>

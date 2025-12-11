@@ -49,11 +49,21 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
     posts,
     postsLoading,
     postsTotal,
+    postsError,
+    postsErrorObj,
   } = viewModel;
 
   const { data: tags = [] } = useTags();
-  const { data: selectedUser } = useUserDetail(showUserModal ? selectedPost?.userId || null : null);
-  const { data: comments = [] } = useComments(selectedPost?.id || 0);
+  const {
+    data: selectedUser,
+    isLoading: userLoading,
+    isError: userError,
+  } = useUserDetail(showUserModal ? selectedPost?.userId || null : null);
+  const {
+    data: comments = [],
+    isLoading: commentsLoading,
+    isError: commentsError,
+  } = useComments(selectedPost?.id || 0);
 
   // Mutations
   const deletePostMutation = useDeletePost();
@@ -221,20 +231,34 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
           />
 
           {/* 게시물 테이블 */}
-          {postsLoading ? (
-            <div className="flex justify-center p-4">로딩 중...</div>
-          ) : (
-            <PostsTable
-              posts={posts}
-              searchQuery={searchQuery}
-              selectedTag={urlParams.tag}
-              onTagSelect={handleTagChange}
-              onPostDetail={handlePostDetail}
-              onEditPost={handleEditPost}
-              onDeletePost={handleDeletePost}
-              onUserClick={handleUserClick}
-            />
-          )}
+          {(() => {
+            if (postsLoading) {
+              return <div className="flex justify-center p-4">로딩 중...</div>;
+            }
+
+            if (postsError) {
+              return (
+                <div className="flex flex-col items-center justify-center p-8 space-y-4">
+                  <div className="text-red-600 text-lg font-semibold">⚠️ 데이터를 불러오는데 실패했습니다</div>
+                  <p className="text-gray-600 text-sm">{postsErrorObj?.message || "알 수 없는 오류가 발생했습니다."}</p>
+                  <Button onClick={() => window.location.reload()}>새로고침</Button>
+                </div>
+              );
+            }
+
+            return (
+              <PostsTable
+                posts={posts}
+                searchQuery={searchQuery}
+                selectedTag={urlParams.tag}
+                onTagSelect={handleTagChange}
+                onPostDetail={handlePostDetail}
+                onEditPost={handleEditPost}
+                onDeletePost={handleDeletePost}
+                onUserClick={handleUserClick}
+              />
+            );
+          })()}
 
           {/* 페이지네이션 */}
           <PaginationControls
@@ -290,6 +314,8 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
         onOpenChange={setShowPostDetailDialog}
         post={selectedPost}
         comments={comments}
+        commentsLoading={commentsLoading}
+        commentsError={commentsError}
         searchQuery={searchQuery}
         onAddComment={handleAddComment}
         onEditComment={handleEditComment}
@@ -298,7 +324,13 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
       />
 
       {/* 사용자 모달 */}
-      <UserModal open={showUserModal} onOpenChange={setShowUserModal} user={selectedUser} />
+      <UserModal
+        open={showUserModal}
+        onOpenChange={setShowUserModal}
+        user={selectedUser}
+        userLoading={userLoading}
+        userError={userError}
+      />
     </Card>
   );
 };

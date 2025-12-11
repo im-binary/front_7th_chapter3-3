@@ -29,22 +29,63 @@ export const usePostsManagerViewModel = () => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-  const { data: searchData, isLoading: searchLoading } = useSearchPosts(urlParams.search);
-  const { data: tagData, isLoading: tagLoading } = usePostsByTag(urlParams.tag, urlParams.limit, urlParams.skip);
-  const { data: defaultPostsData, isLoading: defaultLoading } = usePosts(urlParams.limit, urlParams.skip);
+  const {
+    data: searchData,
+    isLoading: searchLoading,
+    isError: searchError,
+    error: searchErrorObj,
+  } = useSearchPosts(urlParams.search);
 
-  // 우선순위: 검색 > 태그 > 기본
-  const rawPostsData = urlParams.search
-    ? searchData
-    : urlParams.tag && urlParams.tag !== "all"
-      ? tagData
-      : defaultPostsData;
+  const {
+    data: tagData,
+    isLoading: tagLoading,
+    isError: tagError,
+    error: tagErrorObj,
+  } = usePostsByTag(urlParams.tag, urlParams.limit, urlParams.skip);
 
-  const postsLoading = urlParams.search
-    ? searchLoading
-    : urlParams.tag && urlParams.tag !== "all"
-      ? tagLoading
-      : defaultLoading;
+  const {
+    data: defaultPostsData,
+    isLoading: defaultLoading,
+    isError: defaultError,
+    error: defaultErrorObj,
+  } = usePosts(urlParams.limit, urlParams.skip);
+
+  const getActiveQueryResult = () => {
+    // 1순위: 검색
+    if (urlParams.search) {
+      return {
+        data: searchData,
+        isLoading: searchLoading,
+        isError: searchError,
+        error: searchErrorObj,
+      };
+    }
+
+    // 2순위: 태그 필터
+    if (urlParams.tag && urlParams.tag !== "all") {
+      return {
+        data: tagData,
+        isLoading: tagLoading,
+        isError: tagError,
+        error: tagErrorObj,
+      };
+    }
+
+    // 3순위: 기본 목록
+    return {
+      data: defaultPostsData,
+      isLoading: defaultLoading,
+      isError: defaultError,
+      error: defaultErrorObj,
+    };
+  };
+
+  const {
+    data: rawPostsData,
+    isLoading: postsLoading,
+    isError: postsError,
+    error: postsErrorObj,
+  } = getActiveQueryResult();
 
   // 정렬 적용
   const posts = rawPostsData
@@ -103,6 +144,8 @@ export const usePostsManagerViewModel = () => {
     posts,
     postsLoading,
     postsTotal,
+    postsError,
+    postsErrorObj,
 
     // 모달 상태
     showPostDetailDialog,
