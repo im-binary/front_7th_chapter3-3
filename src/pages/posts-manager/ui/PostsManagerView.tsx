@@ -76,7 +76,12 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
   };
 
   const handleDeletePost = async (id: number): Promise<void> => {
-    await deletePostMutation.mutateAsync(id);
+    try {
+      await deletePostMutation.mutateAsync(id);
+    } catch (error) {
+      alert("게시물 삭제 중 오류가 발생했습니다.");
+      console.error(error);
+    }
   };
 
   const handleEditPost = (post: Post) => {
@@ -89,22 +94,32 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
       return;
     }
 
-    await updatePostMutation.mutateAsync({
-      id: editPostFeature.selectedPost.id,
-      post: {
-        title: editPostFeature.selectedPost.title,
-        body: editPostFeature.selectedPost.body,
-      },
-    });
+    try {
+      await updatePostMutation.mutateAsync({
+        id: editPostFeature.selectedPost.id,
+        post: {
+          title: editPostFeature.selectedPost.title,
+          body: editPostFeature.selectedPost.body,
+        },
+      });
 
-    editPostFeature.setOpen(false);
+      editPostFeature.setOpen(false);
+    } catch (error) {
+      alert("게시물 수정 중 오류가 발생했습니다.");
+      console.error(error);
+    }
   };
 
   const handleAddPostSubmit = async () => {
-    await addPostMutation.mutateAsync(addPostFeature.formData);
+    try {
+      await addPostMutation.mutateAsync(addPostFeature.formData);
 
-    addPostFeature.setOpen(false);
-    addPostFeature.setFormData({ title: "", body: "", userId: 1 });
+      addPostFeature.setOpen(false);
+      addPostFeature.setFormData({ title: "", body: "", userId: 1 });
+    } catch (error) {
+      alert("게시물 추가 중 오류가 발생했습니다.");
+      console.error(error);
+    }
   };
 
   const handleAddComment = () => {
@@ -121,14 +136,19 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
       return;
     }
 
-    await addCommentMutation.mutateAsync({
-      body: addCommentFeature.formData.body,
-      postId: addCommentFeature.formData.postId,
-      userId: addCommentFeature.formData.userId,
-    });
+    try {
+      await addCommentMutation.mutateAsync({
+        body: addCommentFeature.formData.body,
+        postId: addCommentFeature.formData.postId,
+        userId: addCommentFeature.formData.userId,
+      });
 
-    addCommentFeature.setOpen(false);
-    addCommentFeature.setFormData({ body: "", postId: null, userId: 1 });
+      addCommentFeature.setOpen(false);
+      addCommentFeature.setFormData({ body: "", postId: null, userId: 1 });
+    } catch (error) {
+      alert("댓글 추가 중 오류가 발생했습니다.");
+      console.error(error);
+    }
   };
 
   const handleEditComment = (comment: Comment) => {
@@ -141,21 +161,36 @@ export const PostsManagerView = ({ viewModel }: PostsManagerViewProps) => {
       return;
     }
 
-    await updateCommentMutation.mutateAsync({
-      id: editCommentFeature.selectedComment.id,
-      body: editCommentFeature.selectedComment.body,
-      postId: editCommentFeature.selectedComment.postId,
-    });
+    try {
+      await updateCommentMutation.mutateAsync({
+        id: editCommentFeature.selectedComment.id,
+        body: editCommentFeature.selectedComment.body,
+        postId: editCommentFeature.selectedComment.postId,
+      });
 
-    editCommentFeature.setOpen(false);
+      editCommentFeature.setOpen(false);
+    } catch (error) {
+      alert("댓글 수정 중 오류가 발생했습니다.");
+      console.error(error);
+    }
   };
 
   const handleDeleteComment = async (id: number) => {
-    await deleteCommentMutation.mutateAsync(id);
+    try {
+      await deleteCommentMutation.mutateAsync(id);
+    } catch (error) {
+      alert("댓글 삭제 중 오류가 발생했습니다.");
+      console.error(error);
+    }
   };
 
   const handleLikeComment = async (id: number, currentLikes: number) => {
-    await likeCommentMutation.mutateAsync({ id, currentLikes });
+    try {
+      await likeCommentMutation.mutateAsync({ id, currentLikes });
+    } catch (error) {
+      alert("좋아요 처리 중 오류가 발생했습니다.");
+      console.error(error);
+    }
   };
 
   return (
